@@ -29,17 +29,29 @@ def write_metadata(metadata, out_dir):
   frames = sum([m[2] for m in metadata])
   hours = frames * hparams.frame_shift_ms / (3600 * 1000)
   print('Wrote %d utterances, %d frames (%.2f hours)' % (len(metadata), frames, hours))
-  print('Max input length:  %d' % max(len(m[3]) for m in metadata))
-  print('Max output length: %d' % max(m[2] for m in metadata))
+  print('Max input length (#words in normalized text):  %d' %
+        max(len(m[3]) for m in metadata))
+  print('Max output length: %d (#frames in spectrogram)' % max(m[2] for m in metadata))
 
 
 def main():
+
   parser = argparse.ArgumentParser()
+
+  # runtime
   parser.add_argument('--base_dir', default=os.path.expanduser('~/tacotron'))
   parser.add_argument('--output', default='training')
   parser.add_argument('--dataset', required=True, choices=['blizzard', 'ljspeech'])
   parser.add_argument('--num_workers', type=int, default=cpu_count())
   args = parser.parse_args()
+
+  # # debug (with ljspeech as example)
+  # args = parser.parse_args()
+  # args.base_dir = os.path.expanduser('~/Work/Projects/keithito-tacotron')
+  # args.output = 'training'
+  # args.dataset = 'ljspeech'
+  # args.num_workers = cpu_count()
+
   if args.dataset == 'blizzard':
     preprocess_blizzard(args)
   elif args.dataset == 'ljspeech':

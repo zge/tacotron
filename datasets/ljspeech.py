@@ -23,13 +23,20 @@ def build_from_path(in_dir, out_dir, num_workers=1, tqdm=lambda x: x):
   executor = ProcessPoolExecutor(max_workers=num_workers)
   futures = []
   index = 1
-  with open(os.path.join(in_dir, 'metadata.csv'), encoding='utf-8') as f:
+  metafile = os.path.join(in_dir, 'metadata.csv')
+  nlines = len(open(metafile, encoding='utf-8').readlines())
+  batchsize = int(nlines/10/1000)*1000
+  with open(metafile, encoding='utf-8') as f:
     for line in f:
+      if index % batchsize == 0:
+        print('%d/%d lines submitted ...' % (index, nlines))
       parts = line.strip().split('|')
       wav_path = os.path.join(in_dir, 'wavs', '%s.wav' % parts[0])
       text = parts[2]
       futures.append(executor.submit(partial(_process_utterance, out_dir, index, wav_path, text)))
       index += 1
+    print('All lines submitted!')
+
   return [future.result() for future in tqdm(futures)]
 
 

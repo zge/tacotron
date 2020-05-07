@@ -24,18 +24,19 @@ def build_from_path(in_dir, out_dir, num_workers=1, tqdm=lambda x: x):
   futures = []
   index = 1
   metafile = os.path.join(in_dir, 'metadata.csv')
-  nlines = len(open(metafile, encoding='utf-8').readlines())
+  lines = open(metafile, encoding='utf-8').readlines()
+  nlines = len(lines)
   batchsize = int(nlines/10/1000)*1000
-  with open(metafile, encoding='utf-8') as f:
-    for line in f:
-      if index % batchsize == 0:
-        print('%d/%d lines submitted ...' % (index, nlines))
-      parts = line.strip().split('|')
-      wav_path = os.path.join(in_dir, 'wavs', '%s.wav' % parts[0])
-      text = parts[2]  # normalized text
-      futures.append(executor.submit(partial(_process_utterance, out_dir, index, wav_path, text)))
-      index += 1
-    print('All lines submitted!')
+  for line in lines:
+    if index % batchsize == 0:
+      print('%d/%d lines submitted ...' % (index, nlines))
+    parts = line.strip().split('|')
+    wav_path = os.path.join(in_dir, 'wavs', '%s.wav' % parts[0])
+    text = parts[2]  # normalized text
+    futures.append(executor.submit(partial(_process_utterance, out_dir, index,
+                                           wav_path, text)))
+    index += 1
+  print('All lines submitted!')
 
   return [future.result() for future in tqdm(futures)]
 

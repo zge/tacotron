@@ -33,6 +33,13 @@ def write_metadata(metadata, out_dir):
         max(len(m[3]) for m in metadata))
   print('Max output length: %d (#frames in spectrogram)' % max(m[2] for m in metadata))
 
+# # Parser for debug use
+# class Parser(object):
+#   def __init__(self):
+#     self.base_dir = ''
+#     self.output = ''
+#     self.dataset = ''
+#     self.num_workers = cpu_count()
 
 def main():
 
@@ -46,7 +53,8 @@ def main():
   args = parser.parse_args()
 
   # # debug (with ljspeech as example)
-  # args = parser.parse_args()
+  # # args = parser.parse_args()
+  # args = Parser()
   # args.base_dir = os.path.expanduser('~/Work/Projects/keithito-tacotron')
   # args.output = 'training'
   # args.dataset = 'ljspeech'

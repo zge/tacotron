@@ -21,7 +21,6 @@ def get_git_commit():
   log('Git commit: %s' % commit)
   return commit
 
-
 def add_stats(model):
   with tf.variable_scope('stats') as scope:
     tf.summary.histogram('linear_outputs', model.linear_outputs)
@@ -121,10 +120,26 @@ def train(log_dir, args):
       traceback.print_exc()
       coord.request_stop(e)
 
+# # Parser for debug use
+# class Parser(object):
+#   def __init__(self):
+#     self.base_dir = ''
+#     self.input = ''
+#     self.model = ''
+#     self.name = 'run2'
+#     self.hparams = ''
+#     self.summary_interval = 100
+#     self.checkpoint_interval = 100
+#     self.slack_url = ''
+#     self.tf_log_level = 1
+#     self.git = True
 
 def main():
+
   parser = argparse.ArgumentParser()
-  parser.add_argument('--base_dir', default=os.path.expanduser('~/tacotron'))
+
+  # runtime
+  parser.add_argument('--base_dir', default=os.path.expanduser('~/Work/Projects/keithito-tacotron'))
   parser.add_argument('--input', default='training/train.txt')
   parser.add_argument('--model', default='tacotron')
   parser.add_argument('--name', help='Name of the run. Used for logging. Defaults to model name.')
@@ -139,6 +154,22 @@ def main():
   parser.add_argument('--tf_log_level', type=int, default=1, help='Tensorflow C++ log level.')
   parser.add_argument('--git', action='store_true', help='If set, verify that the client is clean.')
   args = parser.parse_args()
+
+  # # debug
+  # # args = parser.parse_args()
+  # args = Parser()
+  # args.base_dir = os.path.expanduser('~/Work/Projects/keithito-tacotron')
+  # args.input = 'training/train.txt'
+  # args.model = 'tacotron'
+  # args.name = 'run2'
+  # args.hparams = ''
+  # args.restore_step = 0
+  # args.summary_interval = 100
+  # args.checkpoint_interval = 100
+  # args.slack_url = ''
+  # args.tf_log_level = 1
+  # args.git = False
+
   os.environ['TF_CPP_MIN_LOG_LEVEL'] = str(args.tf_log_level)
   run_name = args.name or args.model
   log_dir = os.path.join(args.base_dir, 'logs-%s' % run_name)
